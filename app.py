@@ -93,6 +93,41 @@ def create_bill():
     db.session.commit()
     return jsonify({"message": "Factura registrada exitosamente"}), 201
 
+# Endpoint DELETE para eliminar facturas
+# Agrega este código a tu archivo app.py
+
+@app.route('/api/bills/<int:bill_id>', methods=['DELETE'])
+def delete_bill(bill_id):
+    """
+    Eliminar una factura por su ID
+    """
+    try:
+        # Buscar la factura en la base de datos
+        bill = Bill.query.get(bill_id)
+        
+        if not bill:
+            return jsonify({
+                'success': False,
+                'message': 'Factura no encontrada'
+            }), 404
+        
+        # Eliminar la factura de la base de datos
+        db.session.delete(bill)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Factura eliminada exitosamente',
+            'deleted_id': bill_id
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            'success': False,
+            'message': f'Error al eliminar la factura: {str(e)}'
+        }), 500
+
 # ✅ **PASO 4: AÑADIR ESTO AL FINAL**
 # --- Iniciar el servidor ---
 if __name__ == "__main__":
